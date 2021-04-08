@@ -1,7 +1,6 @@
 %{
 int lineno = 1;
 #include<stdio.h>
-#include<stdlib.h>
 
 #define AUTO 1
 #define BREAK 2
