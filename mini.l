@@ -2,40 +2,80 @@
 int lineno = 1;
 #include<stdio.h>
 
-#define AUTO 1
-#define BREAK 2
-#define CASE 3
-#define CHAR 4
-#define CONST 5
-#define CONTINUE 6
-#define DEFAULT 7
-#define DO 8
-#define DOUBLE 9
-#define ELSE 10
-#define ENUM 11
-#define EXTERN 12
-#define FLOAT 13
-#define FOR 14
-#define GOTO 15
-#define IF 16
-#define INT 17
-#define LONG 18
-#define REGISTER 19
-#define RETURN 20
-#define SHORT 21
-#define SIGNED 22
-#define SIZEOF 23
-#define STATIC 24
-#define STRUCT 25
-#define SWITCH 26
-#define TYPEDEF 27
-#define UNION 28
-#define UNSIGNED 29
-#define VOID 30
-#define VOLATILE 31
-#define WHILE 32
+#define ARRAY 260
+#define CABECERA 261
+#define CADA 262
+#define CADENA 263
+#define CARACTER 264
+#define CONJUNTO 265
+#define CONSTANTES 266
+#define CONTINUAR 267
+#define CTC_CADENA 268
+#define CTC_CARACTER 269
+#define CTC_ENTERA 270
+#define CTC_REAL 271
+#define DE 272
+#define DEFECTO 273
+#define DEVOLVER 275
+#define EJECUTA 276
+#define ENCAMBIO 277
+#define ENTERO 278
+#define ES 280
+#define ESCAPE 281
+#define ESTRUCTURA 282
+#define ETIQUETA 283
+#define EXCEPCION 284
+#define FICHERO 289
+#define FIN 290
+#define FUNCION 291
+#define HACER 292
+#define HASH 293
+#define IDENTIFICADOR 295
+#define LANZA 297
+#define MIENTRAS 299
+#define NADA 302
+#define OTRA 305
+#define PARA 307
+#define PRINCIPIO 309
+#define PROGRAMA 310
+#define REAL 312
+#define REF 313
+#define RUTA 315
+#define SALTAR 316
+#define SI 317
+#define SINO 318
+#define TAMANO 320
+#define TIPOS 321
+#define UNION 322
+#define VARIABLES 323
 
-#define IDENTIFIER 33
+#define POTENCIA 311
+#define SUMA_ASIG 319
+#define RESTA_ASIG 314
+#define MULT_ASIG 301
+#define DIV_ASIG 274
+#define MOD_ASIG 300
+#define FD_ASIG 285
+#define FI_ASIG 286
+#define FLECHA_DCHA 287
+#define FLECHA_IZDA 288
+#define AND_ASIG 259
+#define XOR_ASIG 324
+#define OR_ASIG 306
+#define POT_ASIG 308
+#define GE 294
+#define LE 298
+#define EQ 279
+#define NEQ 303
+#define AND 258
+#define OR 304
+#define INDIRECCION 296
+
+
+
+
+
+
 #define SLC 34
 #define MLCS 35
 #define MLCE 36
@@ -88,7 +128,6 @@ int lineno = 1;
 
 #define CHAR_CONST 73
 #define SIGNED_CONST 74
-#define STRING_CONST 75
 %}
 
 alpha [A-Za-z]
@@ -104,48 +143,18 @@ string \"(.^([%d]|[%f]|[%s]|[%c]))\"
 %%
 {space}* {}
 {tab}* {}
-{string} return STRING_CONST;
-{char} return CHAR_CONST;
+{string} return CTC_CADENA;
+{char} return CTC_CARACTER;
 {line} {lineno++;}
 auto return AUTO;
-break return BREAK;
-case return CASE;
-char return CHAR;
-const return CONST;
-continue return CONTINUE;
-default return DEFAULT;
-do return DO;
-double return DOUBLE;
-else return ELSE;
-enum return ENUM;
-extern return EXTERN;
-float return FLOAT;
-for return FOR;
-goto return GOTO;
-if return IF;
-int return INT;
-long return LONG;
-register return REGISTER;
-return return RETURN;
-short return SHORT;
-signed return SIGNED;
-sizeof return SIZEOF;
-static return STATIC;
-struct return STRUCT;
-switch return SWITCH;
-typedef return TYPEDEF;
-union return UNION;
-unsigned return UNSIGNED;
-void return VOID;
-volatile return VOLATILE;
-while return WHILE;
 
-printf return PRINTF;
-scanf return SCANF;
 
-{alpha}({alpha}|{digit}|{und})* return IDENTIFIER;
 
-[+-][0-9]{digit}*(\.{digit}+)? return SIGNED_CONST;
+
+
+{alpha}({alpha}|{digit}|{und})* return IDENTIFICADOR;
+
+[0-9]{digit}*(\.{digit}+)? return CTC_ENTERA;
 
 "//" return SLC;
 "/*" return MLCS;
@@ -321,8 +330,8 @@ int main(int argc, char *argv[]) {
       }
       if(scan==33 && mlc==0)
       {
-        printf("%s\t\t\tIDENTIFIER\t\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "IDENTIFIER");
+        printf("%s\t\t\tIDENTIFICADOR\t\t\tLine %d\n", yytext, lineno);
+        insertToHash(yytext, "IDENTIFICADOR");
       }
       if(scan==34)
       {
@@ -366,7 +375,7 @@ int main(int argc, char *argv[]) {
       if(scan==56 && mlc==0)
       {
         printf("%s\t\t\tMAIN FUNCTION\t\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "IDENTIFIER");
+        insertToHash(yytext, "IDENTIFICADOR");
       }
       if((scan==57 || scan==58) && mlc==0)
       {
