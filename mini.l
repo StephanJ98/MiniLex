@@ -71,63 +71,11 @@ int lineno = 1;
 #define OR 304
 #define INDIRECCION 296
 
-
-
-
-
-
-#define SLC 34
-#define MLCS 35
-#define MLCE 36
-
-#define LEQ 37
-#define GEQ 38
-#define EQEQ 39
-#define NEQ 40
-#define LOR 41
-#define LAND 42
-#define ASSIGN 43
-#define PLUS 44
-#define SUB 45
-#define MULT 46
-#define DIV 47
-#define MOD 48
-#define LESSER 49
-#define GREATER 50
-#define INCR 51
-#define DECR 52
-
-#define COMMA 53
-#define SEMI 54
-
-#define HEADER 55
-#define MAIN 56
-
-#define PRINTF 57
-#define SCANF 58
-#define DEFINE 59
-
-#define INT_CONST 60
-#define FLOAT_CONST 61
-
 #define TYPE_SPEC 62
-
-#define DQ 63
-
-#define OBO 64
-#define OBC 65
-#define CBO 66
-#define CBC 67
-#define HASH 68
-
-#define ARR 69
-#define FUNC 70
 
 #define NUM_ERR 71
 #define UNKNOWN 72
 
-#define CHAR_CONST 73
-#define SIGNED_CONST 74
 %}
 
 alpha [A-Za-z]
@@ -145,159 +93,91 @@ string \"(.^([%d]|[%f]|[%s]|[%c]))\"
 {tab}* {}
 {string} return CTC_CADENA;
 {char} return CTC_CARACTER;
-{line} {lineno++;}
-auto return AUTO;
-
-
-
-
+{line} {lineno++;};
+array return ARRAY;
+cabecera return CABECERA;
+cada return CADA;
+cadena return CADENA;
+caracter return CARACTER;
+conjunto return CONJUNTO;
+constantes return CONSTANTES;
+continuar return CONTINUAR;
+de return DE;
+defecto return DEFECTO;
+devolver return DEVOLVER;
+ejecuta return EJECUTA;
+encambio return ENCAMBIO;
+entero return ENTERO;
+es return ES;
+escape return ESCAPE;
+estructura return ESTRUCTURA;
+etiueta return ETIQUETA;
+excepcion return EXCEPCION;
+fichero return FICHERO;
+fin return FIN;
+funcion return FUNCION;
+hacer return HACER;
+hash return HASH;
+identificador return IDENTIFICADOR;
+lanza return LANZA;
+mientras return MIENTRAS;
+nada return NADA;
+otra return OTRA;
+para return PARA;
+principio return PRINCIPIO;
+programa return PROGRAMA;
+real return REAL;
+ref return REF;
+ruta return RUTA;
+saltar return SALTAR;
+si return SI;
+sino return SINO;
+tamano return TAMANO;
+tipos return TIPOS;
+union return UNION;
+variables return VARIABLES;
 
 {alpha}({alpha}|{digit}|{und})* return IDENTIFICADOR;
 
-[0-9]{digit}*(\.{digit}+)? return CTC_ENTERA;
-
-"//" return SLC;
-"/*" return MLCS;
-"*/" return MLCE;
-
-"<=" return LEQ;
-">=" return GEQ;
-"==" return EQEQ;
+"+" return yytext[0];
+"-" return yytext[0];
+"*" return yytext[0];
+"/" return yytext[0];
+"%" return yytext[0];
+"=" return yytext[0];
+"@" return yytext[0];
+"**" return POTENCIA;
+"=+" return SUMA_ASIG;
+"=-" return RESTA_ASIG;
+"=*" return MULT_ASIG;
+"=/" return DIV_ASIG;
+"=%" return MOD_ASIG;
+"=<-" return FI_ASIG;
+"=->" return FD_ASIG;
+"=&" return AND_ASIG;
+"=@" return XOR_ASIG;
+"=|" return OR_ASIG;
+"=**" return POT_ASIG;
+"=>" return GE;
+"=<" return LE;
+"==" return EQ;
 "!=" return NEQ;
-"||" return LOR;
-"&&" return LAND;
-"=" return ASSIGN;
-"+" return PLUS;
-"-" return SUB;
-"*" return MULT;
-"/" return DIV;
-"%" return MOD;
-"<" return LESSER;
-">" return GREATER;
-"++" return INCR;
-"--" return DECR;
+"&&" return AND;
+"||" return OR;
+"<-" return FLECHA_IZDA;
+"->" return FLECHA_DCHA;
+"^." return INDIRECCION;
 
-"," return COMMA;
-";" return SEMI;
-
-"#include<stdio.h>" return HEADER;
-"#include <stdio.h>" return HEADER;
-"main()" return MAIN;
-
-{digit}+ return INT_CONST;
-({digit}+)\.({digit}+) return FLOAT_CONST;
+{digit}+ return CTC_ENTERA;
+({digit}+)\.({digit}+) return CTC_REAL;
 
 "%d"|"%f"|"%u"|"%s" return TYPE_SPEC;
-"\"" return DQ;
-"(" return OBO;
-")" return OBC;
-"{" return CBO;
-"}" return CBC;
-"#" return HASH;
 
-{alpha}({alpha}|{digit}|{und})*\[{digit}*\] return ARR;
-{alpha}({alpha}|{digit}|{und})*\(({alpha}|{digit}|{und}|{space})*\) return FUNC;
+{alpha}({alpha}|{digit}|{und})*\[{digit}*\] return ARRAY;
+{alpha}({alpha}|{digit}|{und})*\(({alpha}|{digit}|{und}|{space})*\) return FUNCION;
 ({digit}+)\.({digit}+)\.({digit}|\.)* return NUM_ERR;
 ({digit}|{at})+({alpha}|{digit}|{und}|{at})* return UNKNOWN;
 %%
-
-struct node
-{
-	char token[100];
-  char attr[100];
-	struct node *next;
-};
-
-struct hash
-{
-	struct node *head;
-	int count;
-};
-
-struct hash hashTable[1000];
-int eleCount = 1000;
-
-struct node * createNode(char *token, char *attr)
-{
-	struct node *newnode;
-	newnode = (struct node *) malloc(sizeof(struct node));
-	strcpy(newnode->token, token);
-	strcpy(newnode->attr, attr);
-	newnode->next = NULL;
-	return newnode;
-}
-
-int hashIndex(char *token)
-{
-	int hi=0;
-	int l,i;
-	for(i=0;token[i]!='\0';i++)
-	{
-		hi = hi + (int)token[i];
-	}
-	hi = hi%eleCount;
-	return hi;
-}
-
-void insertToHash(char *token, char *attr)
-{
-	int flag=0;
-	int hi;
-	hi = hashIndex(token);
-	struct node *newnode = createNode(token, attr);
-	/* head of list for the bucket with index "hashIndex" */
-	if (hashTable[hi].head==NULL)
-	{
-		hashTable[hi].head = newnode;
-    hashTable[hi].count = 1;
-    return;
-	}
-	struct node *myNode;
-  myNode = hashTable[hi].head;
-	while (myNode != NULL)
-    {
-      if (strcmp(myNode->token, token)==0)
-      {
-        flag = 1;
-        break;
-      }
-      myNode = myNode->next;
-    }
-	if(!flag)
-	{
-		//adding new node to the list
-		newnode->next = (hashTable[hi].head);
-		//update the head of the list and no of nodes in the current bucket
-		hashTable[hi].head = newnode;
-		hashTable[hi].count++;
-	}
-	return;
-}
-
-void display()
-{
-  struct node *myNode;
-  int i,j, k=1;
-  printf("-------------------------------------------------------------------");
-  printf("\nSNo \t|\tToken \t\t|\tToken Type \t\n");
-    printf("-------------------------------------------------------------------\n");
-  for (i = 0; i < eleCount; i++)
-  {
-    if (hashTable[i].count == 0)
-      continue;
-    myNode = hashTable[i].head;
-    if (!myNode)
-      continue;
-    while (myNode != NULL)
-    {
-      printf("%d\t\t", k++);
-      printf("%s\t\t\t", myNode->token);
-      printf("%s\t\n", myNode->attr);
-      myNode = myNode->next;
-    }
-	}
-   	return;
-}
 
 int main(int argc, char *argv[]) {
 {
@@ -320,18 +200,16 @@ int main(int argc, char *argv[]) {
       if(lineno!=dqline && dqline!=0)
       {
         if(dq%2!=0)
-          printf("\n******** ERROR!! INCOMPLETE STRING at Line %d ********\n\n", dqline);
+          printf("\n******** ERROR!! Cadena Incompleta en la Linea %d ********\n\n", dqline);
         dq=0;
       }
       if((scan>=1 && scan<=32) && mlc==0)
       {
         printf("%s\t\t\tKEYWORD\t\t\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "KEYWORD");
       }
       if(scan==33 && mlc==0)
       {
         printf("%s\t\t\tIDENTIFICADOR\t\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "IDENTIFICADOR");
       }
       if(scan==34)
       {
@@ -356,7 +234,6 @@ int main(int argc, char *argv[]) {
       if((scan>=37 && scan<=52) && mlc==0)
       {
         printf("%s\t\t\tOPERATOR\t\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "OPERATOR");
       }
       if((scan==53||scan==54||scan==63||(scan>=64 && scan<=68)) && mlc==0)
       {
@@ -366,7 +243,6 @@ int main(int argc, char *argv[]) {
           dq++;
           dqline = lineno;
         }
-        insertToHash(yytext, "SPECIAL SYMBOL");
       }
       if(scan==55 && mlc==0)
       {
@@ -375,12 +251,10 @@ int main(int argc, char *argv[]) {
       if(scan==56 && mlc==0)
       {
         printf("%s\t\t\tMAIN FUNCTION\t\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "IDENTIFICADOR");
       }
       if((scan==57 || scan==58) && mlc==0)
       {
         printf("%s\t\t\tPRE DEFINED FUNCTION\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "PRE DEFINED FUNCTION");
       }
       if(scan==59 && mlc==0)
       {
@@ -389,12 +263,10 @@ int main(int argc, char *argv[]) {
       if(scan==60 && mlc==0)
       {
         printf("%s\t\t\tINTEGER CONSTANT\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "INTEGER CONSTANT");
       }
       if(scan==61 && mlc==0)
       {
         printf("%s\t\t\tFLOATING POINT CONSTANT\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "FLOATING POINT CONSTANT");
       }
       if(scan==62 && mlc==0)
       {
@@ -403,12 +275,10 @@ int main(int argc, char *argv[]) {
       if(scan==69 && mlc==0)
       {
         printf("%s\t\t\tARRAY\t\t\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "ARRAY");
       }
       if(scan==70 && mlc==0)
       {
         printf("%s\t\t\tUSER DEFINED FUNCTION\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "USER DEFINED FUNCTION");
       }
       if(scan==71 && mlc==0)
       {
@@ -421,30 +291,22 @@ int main(int argc, char *argv[]) {
       if(scan==73 && mlc==0)
       {
         printf("%s\t\t\tCHARACTER CONSTANT\t\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "CHARACTER CONSTANT");
       }
       if(scan==74 && mlc==0)
       {
         printf("%s\t\t\tSIGNED CONSTANT\t\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "SIGNED CONSTANT");
       }
       if(scan==75 && mlc==0)
       {
         printf("%s\t\t\tSTRING CONSTANT\t\t\tLine %d\n", yytext, lineno);
-        insertToHash(yytext, "STRING CONSTANT");
       }
       scan = yylex();
     }
     if(mlc==1)
       printf("\n******** ERROR!! UNMATCHED COMMENT STARTING at Line %d ********\n\n",mlcline);
     printf("\n");
-    printf("\n\t******** SYMBOL TABLE ********\t\t\n");
-    display();
-    printf("-------------------------------------------------------------------\n\n");
     }
   }
-
-
 
 }
 int yywrap()
