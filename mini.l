@@ -71,9 +71,12 @@ int lineno = 1;
 #define OR 304
 #define INDIRECCION 296
 
-#define TYPE_SPEC 62
+#define DELIMITADOR 324
+#define COM_S 325
+#define COM_MI 326
+#define COM_MF 327
+#define FUNC 328
 
-#define NUM_ERR 71
 #define UNKNOWN 72
 
 %}
@@ -82,15 +85,13 @@ alpha [A-Za-z]
 digit [0-9]
 und [_]
 space [ ]
-tab [	]
 line [\n]
 char \'.\'
 at [@]
-string \"(.^([%d]|[%f]|[%s]|[%c]))\"
+string \'(.^([%d]|[%f]|[%s]|[%c]))\'
 
 %%
 {space}* {}
-{tab}* {}
 {string} return CTC_CADENA;
 {char} return CTC_CARACTER;
 {line} {lineno++;};
@@ -139,6 +140,19 @@ variables return VARIABLES;
 
 {alpha}({alpha}|{digit}|{und})* return IDENTIFICADOR;
 
+"{" return DELIMITADOR;
+"}" return DELIMITADOR;
+"(" return DELIMITADOR;
+")" return DELIMITADOR;
+":" return DELIMITADOR;
+";" return DELIMITADOR;
+"," return DELIMITADOR;
+
+"##" return COM_S;
+"#-" return COM_MI;
+"-#" return COM_MF;
+
+
 "+" return yytext[0];
 "-" return yytext[0];
 "*" return yytext[0];
@@ -169,13 +183,15 @@ variables return VARIABLES;
 "^." return INDIRECCION;
 
 {digit}+ return CTC_ENTERA;
+\#({digit}+) return CTC_ENTERA;
+\#([abcdefABCDEF])+({digit}+) return CTC_ENTERA;
 ({digit}+)\.({digit}+) return CTC_REAL;
-
-"%d"|"%f"|"%u"|"%s" return TYPE_SPEC;
+\.({digit}+) return CTC_REAL;
+\.\#({digit}+) return CTC_REAL;
+\.\#([abcdefABCDEF])+({digit}+) return CTC_REAL;
 
 {alpha}({alpha}|{digit}|{und})*\[{digit}*\] return ARRAY;
-{alpha}({alpha}|{digit}|{und})*\(({alpha}|{digit}|{und}|{space})*\) return FUNCION;
-({digit}+)\.({digit}+)\.({digit}|\.)* return NUM_ERR;
+{alpha}({alpha}|{digit}|{und})*\(({alpha}|{digit}|{und}|{space})*\) return FUNC;
 ({digit}|{at})+({alpha}|{digit}|{und}|{at})* return UNKNOWN;
 %%
 
@@ -203,102 +219,100 @@ int main(int argc, char *argv[]) {
           printf("\n******** ERROR!! Cadena Incompleta en la Linea %d ********\n\n", dqline);
         dq=0;
       }
-      if((scan>=1 && scan<=32) && mlc==0)
+
+      if((scan>=260 && scan<=267) && mlc==0)
       {
-        printf("%s\t\t\tKEYWORD\t\t\t\tLine %d\n", yytext, lineno);
+        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
+
+      if(scan==268 && mlc==0)
+      {
+        printf("Linea %d, CTC_Cadena: %s\n", lineno, yytext);
+      }
+      if(scan==269 && mlc==0)
+      {
+        printf("Linea %d, CTC_Caracter: %s\n", lineno, yytext);
+      }
+      if(scan==270 && mlc==0)
+      {
+        printf("Linea %d, CTC_Entera: %s\n", lineno, yytext);
+      }
+      if(scan==271 && mlc==0)
+      {
+        printf("Linea %d, CTC_Real: %s\n", lineno, yytext);
+      }
+
+      if((scan>=272 && scan<=273) && mlc==0)
+      {
+        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
+      }
+      if((scan>=275 && scan<=279) && mlc==0)
+      {
+        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
+      }
+      if((scan>=280 && scan<=284) && mlc==0)
+      {
+        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
+      }
+      if((scan>=289 && scan<=293 || scan==295 || scan==297 || scan==299 || scan==302 || scan==305 || scan==307) && mlc==0)
+      {
+        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
+      }
+      if((scan>=309 && scan<=310) && mlc==0)
+      {
+        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
+      }
+      if((scan>=312 && scan<=313) && mlc==0)
+      {
+        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
+      }
+      if((scan>=315 && scan<=318) && mlc==0)
+      {
+        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
+      }
+      if((scan>=320 && scan<=323) && mlc==0)
+      {
+        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
+      }
+      if(scan==328 && mlc==0)
+      {
+        printf("Linea %d, Funcion definida por el usuario %s\n", lineno, yytext);
+      }
+
+
+
+
+
+
+
+
       if(scan==33 && mlc==0)
       {
         printf("%s\t\t\tIDENTIFICADOR\t\t\tLine %d\n", yytext, lineno);
       }
-      if(scan==34)
+      if(scan==325)
       {
-        printf("%s\t\t\tSingleline Comment\t\tLine %d\n", yytext, lineno);
+        printf("Linea %d, Comentario Simple %s\n", lineno, yytext);
         slcline = lineno;
       }
-      if(scan==35 && mlc==0)
+      if(scan==326 && mlc==0)
       {
-        printf("%s\t\t\tMultiline Comment Start\t\tLine %d\n", yytext, lineno);
+        printf("Linea %d, Inicio Comentario Multilinea %s\n", lineno, yytext);
         mlcline = lineno;
         mlc = 1;
       }
-      if(scan==36 && mlc==0)
+      if(scan==327 && mlc==0)
       {
-        printf("\n******** ERROR!! UNMATCHED MULTILINE COMMENT END %s at Line %d ********\n\n", yytext, lineno);
+        printf("Linea %d, ERROR: Fin de Comentario Multilinea sin inicio. %s\n", lineno, yytext);
       }
-      if(scan==36 && mlc==1)
+      if(scan==327 && mlc==1)
       {
         mlc = 0;
-        printf("%s\t\t\tMultiline Comment End\t\tLine %d\n", yytext, lineno);
-      }
-      if((scan>=37 && scan<=52) && mlc==0)
-      {
-        printf("%s\t\t\tOPERATOR\t\t\tLine %d\n", yytext, lineno);
-      }
-      if((scan==53||scan==54||scan==63||(scan>=64 && scan<=68)) && mlc==0)
-      {
-        printf("%s\t\t\tSPECIAL SYMBOL\t\t\tLine %d\n", yytext, lineno);
-        if(scan==63)
-        {
-          dq++;
-          dqline = lineno;
-        }
-      }
-      if(scan==55 && mlc==0)
-      {
-        printf("%s\tHEADER\t\t\t\tLine %d\n",yytext, lineno);
-      }
-      if(scan==56 && mlc==0)
-      {
-        printf("%s\t\t\tMAIN FUNCTION\t\t\tLine %d\n", yytext, lineno);
-      }
-      if((scan==57 || scan==58) && mlc==0)
-      {
-        printf("%s\t\t\tPRE DEFINED FUNCTION\t\tLine %d\n", yytext, lineno);
-      }
-      if(scan==59 && mlc==0)
-      {
-        printf("%s\t\t\tPRE PROCESSOR DIRECTIVE\t\tLine %d\n", yytext, lineno);
-      }
-      if(scan==60 && mlc==0)
-      {
-        printf("%s\t\t\tINTEGER CONSTANT\t\tLine %d\n", yytext, lineno);
-      }
-      if(scan==61 && mlc==0)
-      {
-        printf("%s\t\t\tFLOATING POINT CONSTANT\t\tLine %d\n", yytext, lineno);
-      }
-      if(scan==62 && mlc==0)
-      {
-        printf("%s\t\t\tTYPE SPECIFIER\t\t\tLine %d\n", yytext, lineno);
-      }
-      if(scan==69 && mlc==0)
-      {
-        printf("%s\t\t\tARRAY\t\t\t\tLine %d\n", yytext, lineno);
-      }
-      if(scan==70 && mlc==0)
-      {
-        printf("%s\t\t\tUSER DEFINED FUNCTION\t\tLine %d\n", yytext, lineno);
-      }
-      if(scan==71 && mlc==0)
-      {
-        printf("\n******** ERROR!! CONSTANT ERROR %s at Line %d ********\n\n", yytext, lineno);
+        printf("Linea %d, Fin Comentario Multilinea %s\n", lineno, yytext);
       }
       if(scan==72 && mlc==0)
       {
         printf("\n******** ERROR!! UNKNOWN TOKEN %s at Line %d ********\n\n", yytext, lineno);
-      }
-      if(scan==73 && mlc==0)
-      {
-        printf("%s\t\t\tCHARACTER CONSTANT\t\t\tLine %d\n", yytext, lineno);
-      }
-      if(scan==74 && mlc==0)
-      {
-        printf("%s\t\t\tSIGNED CONSTANT\t\t\tLine %d\n", yytext, lineno);
-      }
-      if(scan==75 && mlc==0)
-      {
-        printf("%s\t\t\tSTRING CONSTANT\t\t\tLine %d\n", yytext, lineno);
       }
       scan = yylex();
     }
