@@ -76,8 +76,10 @@ int lineno = 1;
 #define COM_MI 326
 #define COM_MF 327
 #define FUNC 328
+#define OPERADOR 329
 
 #define UNKNOWN 72
+#define UNKNOWN_CHAR 73
 
 %}
 
@@ -86,15 +88,18 @@ digit [0-9]
 und [_]
 space [ ]
 line [\n]
-char \'.\'
 at [@]
-string \'(.^([%d]|[%f]|[%s]|[%c]))\'
 
 %%
 {space}* {}
-{string} return CTC_CADENA;
-{char} return CTC_CARACTER;
+\'(.)\' return CTC_CARACTER;
+\'\#.\' return CTC_CARACTER;
+\'([a-zA-Z0-9\#]){2,}\' return CTC_CADENA;
+\'\' return CTC_CADENA;
+\#$ return CTC_CADENA;
+
 {line} {lineno++;};
+
 array return ARRAY;
 cabecera return CABECERA;
 cada return CADA;
@@ -140,26 +145,33 @@ variables return VARIABLES;
 
 {alpha}({alpha}|{digit}|{und})* return IDENTIFICADOR;
 
-"{" return DELIMITADOR;
-"}" return DELIMITADOR;
-"(" return DELIMITADOR;
-")" return DELIMITADOR;
-":" return DELIMITADOR;
-";" return DELIMITADOR;
-"," return DELIMITADOR;
+"\{" return DELIMITADOR;
+"\}" return DELIMITADOR;
+"\[" return DELIMITADOR;
+"\]" return DELIMITADOR;
+"\(" return DELIMITADOR;
+"\)" return DELIMITADOR;
+"\:" return DELIMITADOR;
+"\;" return DELIMITADOR;
+"\," return DELIMITADOR;
 
 "##" return COM_S;
 "#-" return COM_MI;
 "-#" return COM_MF;
 
+"+" return OPERADOR;
+"-" return OPERADOR;
+"*" return OPERADOR;
+"/" return OPERADOR;
+"%" return OPERADOR;
+"=" return OPERADOR;
+"@" return OPERADOR;
+"<" return OPERADOR;
+">" return OPERADOR;
+"\\" return OPERADOR;
+"~" return OPERADOR;
+"!" return OPERADOR;
 
-"+" return yytext[0];
-"-" return yytext[0];
-"*" return yytext[0];
-"/" return yytext[0];
-"%" return yytext[0];
-"=" return yytext[0];
-"@" return yytext[0];
 "**" return POTENCIA;
 "=+" return SUMA_ASIG;
 "=-" return RESTA_ASIG;
@@ -178,6 +190,8 @@ variables return VARIABLES;
 "!=" return NEQ;
 "&&" return AND;
 "||" return OR;
+"&" return AND;
+"|" return OR;
 "<-" return FLECHA_IZDA;
 "->" return FLECHA_DCHA;
 "^." return INDIRECCION;
@@ -185,19 +199,55 @@ variables return VARIABLES;
 {digit}+ return CTC_ENTERA;
 \#({digit}+) return CTC_ENTERA;
 \#([abcdefABCDEF])+({digit}+) return CTC_ENTERA;
-({digit}+)\.({digit}+) return CTC_REAL;
+\#([hH])({digit}+) return CTC_ENTERA;
+\#([hH])([abcdefABCDEF]+) return CTC_ENTERA;
+
 \.({digit}+) return CTC_REAL;
 \.\#({digit}+) return CTC_REAL;
 \.\#([abcdefABCDEF])+({digit}+) return CTC_REAL;
+\.\#([hH])({digit}+) return CTC_REAL;
+\.\#([hH])([abcdefABCDEF]+) return CTC_REAL;
 
+({digit}+)\.({digit}+) return CTC_REAL;
+({digit}+)\.\#({digit}+) return CTC_REAL;
+({digit}+)\.\#([abcdefABCDEF])+({digit}+) return CTC_REAL;
+({digit}+)\.\#([hH])({digit}+) return CTC_REAL;
+({digit}+)\.\#([hH])([abcdefABCDEF]+) return CTC_REAL;
+
+\#({digit}+)\.({digit}+) return CTC_REAL;
+\#({digit}+)\.\#({digit}+) return CTC_REAL;
+\#({digit}+)\.\#([abcdefABCDEF])+({digit}+) return CTC_REAL;
+\#({digit}+)\.\#([hH])({digit}+) return CTC_REAL;
+\#({digit}+)\.\#([hH])([abcdefABCDEF]+) return CTC_REAL;
+
+\#([abcdefABCDEF])+({digit}+)\.({digit}+) return CTC_REAL;
+\#([abcdefABCDEF])+({digit}+)\.\#({digit}+) return CTC_REAL;
+\#([abcdefABCDEF])+({digit}+)\.\#([abcdefABCDEF])+({digit}+) return CTC_REAL;
+\#([abcdefABCDEF])+({digit}+)\.\#([hH])({digit}+) return CTC_REAL;
+\#([abcdefABCDEF])+({digit}+)\.\#([hH])([abcdefABCDEF]+) return CTC_REAL;
+
+\#([hH])({digit}+)\.({digit}+) return CTC_REAL;
+\#([hH])({digit}+)\.\#({digit}+) return CTC_REAL;
+\#([hH])({digit}+)\.\#([abcdefABCDEF])+({digit}+) return CTC_REAL;
+\#([hH])({digit}+)\.\#([hH])({digit}+) return CTC_REAL;
+\#([hH])({digit}+)\.\#([hH])([abcdefABCDEF]+) return CTC_REAL;
+
+\#([hH])([abcdefABCDEF]+)\.({digit}+) return CTC_REAL;
+\#([hH])([abcdefABCDEF]+)\.\#({digit}+) return CTC_REAL;
+\#([hH])([abcdefABCDEF]+)\.\#([abcdefABCDEF])+({digit}+) return CTC_REAL;
+\#([hH])([abcdefABCDEF]+)\.\#([hH])({digit}+) return CTC_REAL;
+\#([hH])([abcdefABCDEF]+)\.\#([hH])([abcdefABCDEF]+) return CTC_REAL;
+
+\|(.)+\| return RUTA;
 {alpha}({alpha}|{digit}|{und})*\[{digit}*\] return ARRAY;
 {alpha}({alpha}|{digit}|{und})*\(({alpha}|{digit}|{und}|{space})*\) return FUNC;
-({digit}|{at})+({alpha}|{digit}|{und}|{at})* return UNKNOWN;
+([a-zA-z0-9])+\' return UNKNOWN;
+\'([a-zA-z0-9])+ return UNKNOWN;
+([áéíóúàèìòùAâêîôûäëïöüç]) return UNKNOWN_CHAR;
 %%
 
 int main(int argc, char *argv[]) {
 {
-
   if (argc < 2) {
     printf("Uso: ./mini NombreArchivo\n");
     }
@@ -208,75 +258,68 @@ int main(int argc, char *argv[]) {
     scan = yylex();
     while(scan)
     {
-      if(lineno == slcline)
-      {
+      if(lineno == slcline){
         scan = yylex();
         continue;
       }
-      if(lineno!=dqline && dqline!=0)
-      {
+      if(lineno!=dqline && dqline!=0){
         if(dq%2!=0)
           printf("\n******** ERROR!! Cadena Incompleta en la Linea %d ********\n\n", dqline);
         dq=0;
       }
 
-      if((scan>=260 && scan<=267) && mlc==0)
-      {
+      if((scan>=260 && scan<=267) && mlc==0){
         printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
 
-      if(scan==268 && mlc==0)
-      {
+      if(scan==268 && mlc==0){
         printf("Linea %d, CTC_Cadena: %s\n", lineno, yytext);
       }
-      if(scan==269 && mlc==0)
-      {
+      if(scan==269 && mlc==0){
         printf("Linea %d, CTC_Caracter: %s\n", lineno, yytext);
       }
-      if(scan==270 && mlc==0)
-      {
+      if(scan==270 && mlc==0){
         printf("Linea %d, CTC_Entera: %s\n", lineno, yytext);
       }
-      if(scan==271 && mlc==0)
-      {
+      if(scan==271 && mlc==0){
         printf("Linea %d, CTC_Real: %s\n", lineno, yytext);
       }
 
-      if((scan>=272 && scan<=273) && mlc==0)
-      {
+      if((scan>=272 && scan<=273) && mlc==0){
         printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
-      if((scan>=275 && scan<=279) && mlc==0)
-      {
+      if((scan>=275 && scan<=279) && mlc==0){
         printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
-      if((scan>=280 && scan<=284) && mlc==0)
-      {
+      if((scan>=280 && scan<=284) && mlc==0){
         printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
-      if((scan>=289 && scan<=293 || scan==295 || scan==297 || scan==299 || scan==302 || scan==305 || scan==307) && mlc==0)
-      {
+      if((scan>=289 && scan<=293 || scan==295 || scan==297 || scan==299 || scan==302 || scan==305 || scan==307) && mlc==0){
         printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
-      if((scan>=309 && scan<=310) && mlc==0)
-      {
+      if((scan>=309 && scan<=310) && mlc==0){
         printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
-      if((scan>=312 && scan<=313) && mlc==0)
-      {
+      if((scan>=312 && scan<=313) && mlc==0){
         printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
-      if((scan>=315 && scan<=318) && mlc==0)
-      {
+      if((scan>=316 && scan<=318) && mlc==0){
         printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
-      if((scan>=320 && scan<=323) && mlc==0)
-      {
+      if((scan>=320 && scan<=323) && mlc==0){
         printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
-      if(scan==328 && mlc==0)
-      {
-        printf("Linea %d, Funcion definida por el usuario %s\n", lineno, yytext);
+      if(scan==328 && mlc==0){
+        printf("Linea %d, Funcion definida por el usuario: %s\n", lineno, yytext);
+      }
+      if(scan==315 && mlc==0){
+        printf("Linea %d, Ruta: %s\n", lineno, yytext);
+      }
+      if(scan==329 && mlc==0){
+        printf("Linea %d, Operador: %s\n", lineno, yytext);
+      }
+      if(scan==324 && mlc==0){
+        printf("Linea %d, Delimitador: %s\n", lineno, yytext);
       }
 
 
@@ -286,44 +329,40 @@ int main(int argc, char *argv[]) {
 
 
 
-      if(scan==33 && mlc==0)
-      {
+      if(scan==33 && mlc==0){
         printf("%s\t\t\tIDENTIFICADOR\t\t\tLine %d\n", yytext, lineno);
       }
-      if(scan==325)
-      {
+      if(scan==325){
         printf("Linea %d, Comentario Simple %s\n", lineno, yytext);
         slcline = lineno;
       }
-      if(scan==326 && mlc==0)
-      {
+      if(scan==326 && mlc==0){
         printf("Linea %d, Inicio Comentario Multilinea %s\n", lineno, yytext);
         mlcline = lineno;
         mlc = 1;
       }
-      if(scan==327 && mlc==0)
-      {
+      if(scan==327 && mlc==0){
         printf("Linea %d, ERROR: Fin de Comentario Multilinea sin inicio. %s\n", lineno, yytext);
       }
-      if(scan==327 && mlc==1)
-      {
+      if(scan==327 && mlc==1){
         mlc = 0;
         printf("Linea %d, Fin Comentario Multilinea %s\n", lineno, yytext);
       }
-      if(scan==72 && mlc==0)
-      {
-        printf("\n******** ERROR!! UNKNOWN TOKEN %s at Line %d ********\n\n", yytext, lineno);
+      if(scan==72 && mlc==0){
+        printf("ERROR: Linea %d, Cadena incorrecta: %s\n", lineno, yytext);
+      }
+      if(scan==73 && mlc==0){
+        printf("ERROR: Linea %d, Caracter incorrecta: %s\n", lineno, yytext);
       }
       scan = yylex();
     }
     if(mlc==1)
-      printf("\n******** ERROR!! UNMATCHED COMMENT STARTING at Line %d ********\n\n",mlcline);
+      printf("Linea %d, ERROR: Inicio de Comentario Multilinea sin cierre. %s\n", lineno, yytext);
     printf("\n");
     }
   }
 
 }
-int yywrap()
-{
+int yywrap(){
 	return 1;
 }
