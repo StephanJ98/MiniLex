@@ -1,82 +1,14 @@
 %{
 int lineno = 1;
-#include<stdio.h>
+#include <stdio.h>
+#include "tokens.h"
 
-#define ARRAY 260
-#define CABECERA 261
-#define CADA 262
-#define CADENA 263
-#define CARACTER 264
-#define CONJUNTO 265
-#define CONSTANTES 266
-#define CONTINUAR 267
-#define CTC_CADENA 268
-#define CTC_CARACTER 269
-#define CTC_ENTERA 270
-#define CTC_REAL 271
-#define DE 272
-#define DEFECTO 273
-#define DEVOLVER 275
-#define EJECUTA 276
-#define ENCAMBIO 277
-#define ENTERO 278
-#define ES 280
-#define ESCAPE 281
-#define ESTRUCTURA 282
-#define ETIQUETA 283
-#define EXCEPCION 284
-#define FICHERO 289
-#define FIN 290
-#define FUNCION 291
-#define HACER 292
-#define HASH 293
-#define IDENTIFICADOR 295
-#define LANZA 297
-#define MIENTRAS 299
-#define NADA 302
-#define OTRA 305
-#define PARA 307
-#define PRINCIPIO 309
-#define PROGRAMA 310
-#define REAL 312
-#define REF 313
-#define RUTA 315
-#define SALTAR 316
-#define SI 317
-#define SINO 318
-#define TAMANO 320
-#define TIPOS 321
-#define UNION 322
-#define VARIABLES 323
-
-#define POTENCIA 311
-#define SUMA_ASIG 319
-#define RESTA_ASIG 314
-#define MULT_ASIG 301
-#define DIV_ASIG 274
-#define MOD_ASIG 300
-#define FD_ASIG 285
-#define FI_ASIG 286
-#define FLECHA_DCHA 287
-#define FLECHA_IZDA 288
-#define AND_ASIG 259
-#define XOR_ASIG 324
-#define OR_ASIG 306
-#define POT_ASIG 308
-#define GE 294
-#define LE 298
-#define EQ 279
-#define NEQ 303
-#define AND 258
-#define OR 304
-#define INDIRECCION 296
-
-#define DELIMITADOR 324
-#define COM_S 325
-#define COM_MI 326
-#define COM_MF 327
-#define FUNC 328
-#define OPERADOR 329
+#define DELIMITADOR 325
+#define COM_S 326
+#define COM_MI 327
+#define COM_MF 328
+#define FUNC 329
+#define OPERADOR 330
 
 #define UNKNOWN 72
 #define UNKNOWN_CHAR 73
@@ -276,39 +208,39 @@ int main(int argc, char *argv[]) {
         printf("Linea %d, CTC_Real: %s\n", lineno, yytext);
       }
 
-      if(((scan>=260 && scan<=267) || (scan>=272 && scan<=273) || (scan>=275 && scan<=279) || (scan>=280 && scan<=284) || (scan>=289 && scan<=293) || scan==297 || scan==299 || scan==302 || scan==305 || scan==307 || scan==309 || scan==310 || scan==312 || scan==313 || scan==316 || scan==317 || scan==318 || scan==320 || scan==321 || scan==322 || scan==323) && mlc==0){
+      if(((scan>=260 && scan<=267) || (scan>=275 && scan<=279) || (scan>=280 && scan<=284) || (scan>=289 && scan<=293) || scan==272 || scan==273 || scan==297 || scan==299 || scan==302 || scan==305 || scan==307 || scan==309 || scan==310 || scan==312 || scan==313 || scan==316 || scan==317 || scan==318 || scan==320 || scan==321 || scan==322 || scan==323 ) && mlc==0){
         printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
 
-      if(scan==328 && mlc==0){
+      if(scan==329 && mlc==0){
         printf("Linea %d, Funcion definida por el usuario: %s\n", lineno, yytext);
       }
       if(scan==315 && mlc==0){
         printf("Linea %d, Ruta: %s\n", lineno, yytext);
       }
-      if(scan==329 && mlc==0){
+      if(scan==330 && mlc==0){
         printf("Linea %d, Operador: %s\n", lineno, yytext);
       }
-      if(scan==324 && mlc==0){
+      if(scan==325 && mlc==0){
         printf("Linea %d, Delimitador: %s\n", lineno, yytext);
       }
       if(scan==295 && mlc==0){
         printf("Linea %d, Identificador: %s\n", lineno, yytext);
       }
 
-      if(scan==325){
+      if(scan==326){
         printf("Linea %d, Comentario Simple: %s\n", lineno, yytext);
         slcline = lineno;
       }
-      if(scan==326 && mlc==0){
+      if(scan==327 && mlc==0){
         printf("Linea %d, Inicio Comentario Multilinea: %s\n", lineno, yytext);
         mlcline = lineno;
         mlc = 1;
       }
-      if(scan==327 && mlc==0){
+      if(scan==328 && mlc==0){
         printf("Linea %d, ERROR: Fin de Comentario Multilinea sin inicio. %s\n", lineno, yytext);
       }
-      if(scan==327 && mlc==1){
+      if(scan==328 && mlc==1){
         mlc = 0;
         printf("Linea %d, Fin Comentario Multilinea: %s\n", lineno, yytext);
       }
