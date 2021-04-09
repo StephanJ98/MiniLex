@@ -2867,7 +2867,7 @@ int main(int argc, char *argv[]) {
     printf("Uso: ./mini NombreArchivo\n");
     }
   else {
-    int scan, slcline=0, mlc=0, mlcline=0, dq=0, dqline=0;
+    int scan, slcline=0, mlc=0, mlcline=0;
     yyin = fopen(argv[1],"r");
     printf("\n\n");
     scan = yylex();
@@ -2876,15 +2876,6 @@ int main(int argc, char *argv[]) {
       if(lineno == slcline){
         scan = yylex();
         continue;
-      }
-      if(lineno!=dqline && dqline!=0){
-        if(dq%2!=0)
-          printf("\n******** ERROR!! Cadena Incompleta en la Linea %d ********\n\n", dqline);
-        dq=0;
-      }
-
-      if((scan>=260 && scan<=267) && mlc==0){
-        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
 
       if(scan==268 && mlc==0){
@@ -2900,30 +2891,16 @@ int main(int argc, char *argv[]) {
         printf("Linea %d, CTC_Real: %s\n", lineno, yytext);
       }
 
-      if((scan>=272 && scan<=273) && mlc==0){
+
+
+
+      if(((scan>=260 && scan<=267) || (scan>=272 && scan<=273) || (scan>=275 && scan<=279) || (scan>=280 && scan<=284) || (scan>=289 && scan<=293) || scan==297 || scan==299 || scan==302 || scan==305 || scan==307 || scan==309 || scan==310 || scan==312 || scan==313 || scan==316 || scan==317 || scan==318 || scan==320 || scan==321 || scan==322 || scan==323) && mlc==0){
         printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
       }
-      if((scan>=275 && scan<=279) && mlc==0){
-        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
-      }
-      if((scan>=280 && scan<=284) && mlc==0){
-        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
-      }
-      if((scan>=289 && scan<=293 || scan==295 || scan==297 || scan==299 || scan==302 || scan==305 || scan==307) && mlc==0){
-        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
-      }
-      if((scan>=309 && scan<=310) && mlc==0){
-        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
-      }
-      if((scan>=312 && scan<=313) && mlc==0){
-        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
-      }
-      if((scan>=316 && scan<=318) && mlc==0){
-        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
-      }
-      if((scan>=320 && scan<=323) && mlc==0){
-        printf("Linea %d, Palabra Reservada: %s\n", lineno, yytext);
-      }
+
+
+
+
       if(scan==328 && mlc==0){
         printf("Linea %d, Funcion definida por el usuario: %s\n", lineno, yytext);
       }
@@ -2936,23 +2913,15 @@ int main(int argc, char *argv[]) {
       if(scan==324 && mlc==0){
         printf("Linea %d, Delimitador: %s\n", lineno, yytext);
       }
-
-
-
-
-
-
-
-
-      if(scan==33 && mlc==0){
-        printf("%s\t\t\tIDENTIFICADOR\t\t\tLine %d\n", yytext, lineno);
+      if(scan==295 && mlc==0){
+        printf("Linea %d, Identificador: %s\n", lineno, yytext);
       }
       if(scan==325){
-        printf("Linea %d, Comentario Simple %s\n", lineno, yytext);
+        printf("Linea %d, Comentario Simple: %s\n", lineno, yytext);
         slcline = lineno;
       }
       if(scan==326 && mlc==0){
-        printf("Linea %d, Inicio Comentario Multilinea %s\n", lineno, yytext);
+        printf("Linea %d, Inicio Comentario Multilinea: %s\n", lineno, yytext);
         mlcline = lineno;
         mlc = 1;
       }
@@ -2961,7 +2930,7 @@ int main(int argc, char *argv[]) {
       }
       if(scan==327 && mlc==1){
         mlc = 0;
-        printf("Linea %d, Fin Comentario Multilinea %s\n", lineno, yytext);
+        printf("Linea %d, Fin Comentario Multilinea: %s\n", lineno, yytext);
       }
       if(scan==72 && mlc==0){
         printf("ERROR: Linea %d, Cadena incorrecta: %s\n", lineno, yytext);
